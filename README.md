@@ -3,7 +3,7 @@ Silav! Hi There!
 **Building Kurdish Identity in the Digital Age**
 
 rojtevkurdi.org · kurdnasname@gmail.com
-
+rojtevkurdi.vercel.app
 ---
 
 For centuries, the Kurdish people have been forced to live not by their own identity, but by identities imposed upon them. Their names were changed, their language was banned, and their cultural existence was systematically erased. With a population of over forty million, split across four states, the Kurds remain the world's largest stateless people — denied identity rights in their own homeland and targeted by policies of erasure throughout history.
