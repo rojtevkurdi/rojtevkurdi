@@ -398,14 +398,39 @@ async function restoreApp(twitter){
 }
 
 async function deleteApp(twitter){
-  const btn=event.currentTarget;
-  mobileConfirm(btn,async()=>{
+  // Find the button by twitter handle
+  const allBtns=document.querySelectorAll('.btn-delete');
+  let btn=null;
+  allBtns.forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes(twitter))btn=b;});
+  if(!btn){
+    // fallback: direct delete
     try{
       await sbFetch('applications?twitter=eq.'+twitter,{method:'DELETE',prefer:'return=minimal'});
       toast('Jêbirina: @'+twitter);
       await loadApps();
     }catch(e){toast('Xelet',false);}
-  });
+    return;
+  }
+  if(btn.dataset.confirming==='1'){
+    btn.dataset.confirming='0';
+    try{
+      await sbFetch('applications?twitter=eq.'+twitter,{method:'DELETE',prefer:'return=minimal'});
+      toast('Jêbirina: @'+twitter);
+      await loadApps();
+    }catch(e){toast('Xelet',false);}
+    return;
+  }
+  const orig=btn.innerHTML;
+  btn.dataset.confirming='1';
+  btn.innerHTML='⚠️ Dîsa bixin!';
+  btn.style.background='rgba(192,57,43,.6)';
+  setTimeout(()=>{
+    if(btn.dataset.confirming==='1'){
+      btn.dataset.confirming='0';
+      btn.innerHTML=orig;
+      btn.style.background='';
+    }
+  },3000);
 }
 
 async function resetPw(twitter){
