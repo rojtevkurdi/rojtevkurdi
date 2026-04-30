@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ku" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>nasKURD · Admin</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --red:#C8202A;--gold:#C4A24C;--green:#1B7040;
+  --bg:#020810;--card:rgba(8,20,40,.9);--border:rgba(196,162,76,.15);
+  --text:#e8e4d8;--muted:rgba(200,180,120,.45);
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+@keyframes sp{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* FLAG STRIP */
+.flag{height:4px;background:linear-gradient(90deg,var(--red) 0%,var(--red) 33%,#fff 33%,#fff 67%,var(--green) 67%);width:100%}
+
+/* LOGIN */
+#login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;animation:fade .4s ease}
+.login-box{width:100%;max-width:340px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 24px;backdrop-filter:blur(20px)}
+.roj{width:48px;height:48px;margin:0 auto 20px;display:block}
+.roj svg{animation:sp 20s linear infinite}
+.login-title{text-align:center;font-size:18px;font-weight:700;color:var(--gold);letter-spacing:2px;margin-bottom:4px}
+.login-sub{text-align:center;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
+.inp{width:100%;padding:12px 16px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;transition:.2s}
+.inp:focus{border-color:var(--gold);background:rgba(196,162,76,.05)}
+.btn-login{width:100%;margin-top:12px;padding:13px;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:.2s}
+.btn-login:hover{opacity:.9;transform:translateY(-1px)}
+.err{color:#E05050;font-size:11px;text-align:center;margin-top:8px;display:none}
+
+/* ADMIN PANEL */
+#admin{display:none;min-height:100vh;animation:fade .3s ease}
+.top-bar{padding:12px 16px;background:rgba(8,20,40,.95);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px)}
+.top-logo{display:flex;align-items:center;gap:8px}
+.top-logo span{font-size:13px;font-weight:700;color:var(--gold);letter-spacing:2px}
+.top-roj{width:24px;height:24px;flex-shrink:0}
+.top-roj svg{animation:sp 20s linear infinite}
+.btn-out{padding:6px 14px;background:rgba(200,32,42,.12);border:1px solid rgba(200,32,42,.3);border-radius:8px;color:#E05050;font-size:11px;font-weight:700;cursor:pointer}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:16px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.stat-n{font-size:22px;font-weight:800;color:var(--gold)}
+.stat-l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+.tabs{display:flex;padding:0 16px;gap:4px;border-bottom:1px solid var(--border);overflow-x:auto}
+.tab{padding:10px 14px;font-size:11px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:.2s;letter-spacing:.5px}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold)}
+
+.list{padding:12px 16px}
+.app-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;animation:fade .3s ease}
+.app-card.rtk{border-color:rgba(196,162,76,.3)}
+.app-name{font-size:15px;font-weight:800;color:#f0e6cc}
+.app-handle{font-size:10px;color:var(--gold);font-family:monospace;margin-top:2px}
+.app-info{background:rgba(255,255,255,.02);border:1px solid rgba(196,162,76,.07);border-radius:8px;padding:8px 10px;margin:8px 0}
+.info-row{display:flex;gap:6px;margin-bottom:4px;align-items:center;font-size:10px}
+.info-row:last-child{margin-bottom:0}
+.info-lbl{color:var(--muted);min-width:48px}
+.info-val{color:rgba(220,200,160,.8);font-weight:600}
+.app-btns{display:flex;gap:6px}
+.btn-approve{flex:1;padding:9px;border-radius:8px;background:rgba(30,112,64,.15);border:1px solid rgba(30,112,64,.4);color:#4EC87A;font-size:11px;font-weight:700;cursor:pointer;transition:.15s}
+.btn-approve:hover{background:rgba(30,112,64,.25)}
+.btn-reject{flex:1;padding:9px;border-radius:8px;background:rgba(200,32,42,.1);border:1px solid rgba(200,32,42,.35);color:#E05050;font-size:11px;font-weight:700;cursor:pointer;transition:.15s}
+.btn-reject:hover{background:rgba(200,32,42,.2)}
+.btn-revoke{width:100%;padding:8px;border-radius:8px;background:rgba(200,32,42,.08);border:1px solid rgba(200,32,42,.3);color:#E05050;font-size:10px;cursor:pointer;margin-top:4px;transition:.15s}
+.btn-reset{width:100%;padding:8px;border-radius:8px;background:rgba(196,162,76,.08);border:1px solid rgba(196,162,76,.25);color:var(--gold);font-size:10px;cursor:pointer;margin-bottom:4px;transition:.15s}
+.btn-restore{width:100%;padding:8px;border-radius:8px;background:rgba(30,112,64,.1);border:1px solid rgba(30,112,64,.35);color:#4EC87A;font-size:10px;cursor:pointer;margin-bottom:4px;transition:.15s}
+.btn-delete{width:100%;padding:8px;border-radius:8px;background:rgba(8,20,40,.3);border:1px solid rgba(200,32,42,.4);color:#E05050;font-size:10px;cursor:pointer;transition:.15s}
+.rtk-badge{display:inline-flex;align-items:center;gap:3px;background:linear-gradient(90deg,rgba(212,168,42,.2),rgba(196,162,76,.1));border:1px solid rgba(212,168,42,.4);border-radius:4px;padding:1px 6px;font-size:8px;font-weight:700;color:var(--gold)}
+.id-badge{font-size:9px;color:#4EC87A;font-weight:700}
+.date{font-size:8px;color:var(--muted)}
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:12px}
+
+/* Invite section */
+.invite-box{margin:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.invite-title{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;letter-spacing:1px}
+.invite-current{font-size:11px;color:var(--muted);margin-bottom:12px}
+.invite-current span{color:var(--gold);font-weight:700}
+.invite-row{display:flex;gap:8px}
+.invite-inp{flex:1;padding:10px 14px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;letter-spacing:2px;outline:none}
+.invite-inp:focus{border-color:var(--gold)}
+.btn-save{padding:10px 16px;background:linear-gradient(90deg,var(--gold),#8A6010);border:none;border-radius:8px;color:#000;font-size:12px;font-weight:700;cursor:pointer}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(30,112,64,.95);color:#fff;padding:10px 20px;border-radius:10px;font-size:12px;font-weight:700;display:none;z-index:9999;white-space:nowrap}
+
+/* Loading */
+.loading{text-align:center;padding:40px;color:var(--muted);animation:pulse 1.5s infinite}
+</style>
+</head>
+<body>
+<div class="flag"></div>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <div class="roj">
+      <svg width="48" height="48" viewBox="0 0 38 38">
+        <defs><radialGradient id="rg" cx="40%" cy="38%" r="62%"><stop offset="0%" stop-color="#FFE97A"/><stop offset="45%" stop-color="#D4A82A"/><stop offset="100%" stop-color="#8B6010"/></radialGradient></defs>
+        <g id="rays"></g>
+        <circle cx="19" cy="19" r="2.9" fill="url(#rg)"/>
+      </svg>
+    </div>
+    <div class="login-title">nasKURD</div>
+    <div class="login-sub">Admin Panel · Roj Tev Kurdî</div>
+    <input class="inp" id="pw" type="password" placeholder="Şîfre..." autocomplete="off">
+    <button class="btn-login" onclick="doLogin()">Têkeve →</button>
+    <div class="err" id="pw-err">Şîfre xelet e</div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin">
+  <div class="top-bar">
+    <div class="top-logo">
+      <div class="top-roj">
+        <svg width="24" height="24" viewBox="0 0 38 38">
+          <defs><radialGradient id="rg2" cx="40%" cy="38%" r="62%"><stop offset="0%" stop-color="#FFE97A"/><stop offset="45%" stop-color="#D4A82A"/><stop offset="100%" stop-color="#8B6010"/></radialGradient></defs>
+          <g id="rays2"></g>
+          <circle cx="19" cy="19" r="2.9" fill="url(#rg2)"/>
+        </svg>
+      </div>
+      <span>nasKURD ADMIN</span>
+    </div>
+    <button class="btn-out" onclick="doLogout()">Derkeve</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="cnt-p">0</div><div class="stat-l">Benda</div></div>
+    <div class="stat"><div class="stat-n" id="cnt-a" style="color:#4EC87A">0</div><div class="stat-l">Erêkirî</div></div>
+    <div class="stat"><div class="stat-n" id="cnt-r" style="color:#E05050">0</div><div class="stat-l">Redkirî</div></div>
+    <div class="stat"><div class="stat-n" id="cnt-v" style="color:var(--muted)">0</div><div class="stat-l">Betal</div></div>
+  </div>
+
+  <!-- Invite Code -->
+  <div class="invite-box">
+    <div class="invite-title">🎟 Koda Vexwendinê</div>
+    <div class="invite-current">Niha: <span id="inv-current">...</span></div>
+    <div class="invite-row">
+      <input class="invite-inp" id="inv-inp" type="text" maxlength="20" placeholder="Koda nû...">
+      <button class="btn-save" onclick="saveInvite()">Biguherîne</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab on" id="tab-p" onclick="setTab('pending')">Benda</div>
+    <div class="tab" id="tab-a" onclick="setTab('approved')">Erêkirî</div>
+    <div class="tab" id="tab-r" onclick="setTab('rejected')">Redkirî</div>
+    <div class="tab" id="tab-v" onclick="setTab('revoked')">Betal</div>
+  </div>
+
+  <div class="list" id="app-list"><div class="loading">Barkirin...</div></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SB_URL='https://ayyuetqyfjdbxmnqhgyz.supabase.co';
+const SB_KEY='sb_publishable_dNrjycfPx-IVej6rxH0ICw_uVNzyWZD';
+
+// Admin password hash (same as nasKURD)
+function hp(s){let h=0;for(let i=0;i<s.length;i++)h=(Math.imul(31,h)+s.charCodeAt(i))|0;return h.toString(36);}
+const APWD=hp('rojtev17');
+
+let apps=[], curTab='pending', inviteCode='nasKURD2025';
+
+// Build Roj sun SVG rays
+function makeRays(id,cx=19,cy=19,n=21){
+  const el=document.getElementById(id);if(!el)return;
+  const r1=19*.27,r2=19*.4;let s='';
+  for(let i=0;i<n;i++){
+    const a1=(i*360/n-90)*Math.PI/180,a2=((i+.5)*360/n-90)*Math.PI/180;
+    const x1=cx+r1*Math.cos(a1),y1=cy+r1*Math.sin(a1),x2=cx+r2*Math.cos(a2),y2=cy+r2*Math.sin(a2);
+    s+=`<polygon points="${cx},${cy} ${x1.toFixed(2)},${y1.toFixed(2)} ${x2.toFixed(2)},${y2.toFixed(2)}" fill="url(#rg)"/>`;
+  }
+  el.innerHTML=s;
+  const el2=document.getElementById(id+'2');
+  if(el2)el2.innerHTML=s.replace(/url\(#rg\)/g,'url(#rg2)');
+}
+makeRays('rays');
+
+async function sbFetch(path,opts={}){
+  return fetch(SB_URL+'/rest/v1/'+path,{
+    headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':opts.prefer||'return=representation'},
+    ...opts
+  });
+}
+
+function toast(msg,ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=ok?'rgba(30,112,64,.95)':'rgba(200,32,42,.95)';
+  t.style.display='block';
+  setTimeout(()=>t.style.display='none',3000);
+}
+
+// LOGIN
+document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+function doLogin(){
+  const v=document.getElementById('pw').value;
+  const err=document.getElementById('pw-err');
+  if(hp(v)!==APWD){err.style.display='block';document.getElementById('pw').value='';return;}
+  err.style.display='none';
+  sessionStorage.setItem('nk_admin','1');
+  document.getElementById('login').style.display='none';
+  document.getElementById('admin').style.display='block';
+  loadAll();
+}
+function doLogout(){
+  sessionStorage.removeItem('nk_admin');
+  location.reload();
+}
+
+// Auto-login if session exists
+if(sessionStorage.getItem('nk_admin')==='1'){
+  document.getElementById('login').style.display='none';
+  document.getElementById('admin').style.display='block';
+  loadAll();
+}
+
+async function loadAll(){
+  await Promise.all([loadApps(), loadInvite()]);
+}
+
+async function loadApps(){
+  document.getElementById('app-list').innerHTML='<div class="loading">Barkirin...</div>';
+  try{
+    const res=await sbFetch('applications?select=*&order=submitted_at.asc');
+    const data=await res.json();
+    if(Array.isArray(data)){
+      apps=data.map(r=>({
+        twitter:r.twitter||'',email:r.email||'',name:r.name||'',
+        country:r.country||'',affinity:r.affinity||'',
+        langs:r.langs||[],zaravalar:r.dialects||[],vejin:r.vejin||false,
+        status:r.status||'pending',submitted:r.submitted_at?r.submitted_at.slice(0,10):'',
+        id:r.krd_number||'',did:r.did||'',serial:r.serial||null,
+        kurNo:r.notes||'',pw_reset:r.pw_reset||false,
+        _id:r.id
+      }));
+      updateStats();
+      renderList();
+    }
+  }catch(e){document.getElementById('app-list').innerHTML='<div class="empty">Xelet: '+e.message+'</div>';}
+}
+
+async function loadInvite(){
+  try{
+    const res=await sbFetch('invite_codes?active=eq.true&select=code&limit=1');
+    const data=await res.json();
+    if(data&&data.length>0){inviteCode=data[0].code;}
+    document.getElementById('inv-current').textContent=inviteCode;
+  }catch(e){}
+}
+
+function updateStats(){
+  document.getElementById('cnt-p').textContent=apps.filter(a=>(a.status||'pending')==='pending').length;
+  document.getElementById('cnt-a').textContent=apps.filter(a=>a.status==='approved').length;
+  document.getElementById('cnt-r').textContent=apps.filter(a=>a.status==='rejected').length;
+  document.getElementById('cnt-v').textContent=apps.filter(a=>a.status==='revoked').length;
+}
+
+function setTab(t){
+  curTab=t;
+  ['pending','approved','rejected','revoked'].forEach(x=>{
+    document.getElementById('tab-'+x[0]).classList.toggle('on',x===t);
+  });
+  renderList();
+}
+
+function renderList(){
+  const filt=apps.filter(a=>(a.status||'pending')===curTab);
+  const el=document.getElementById('app-list');
+  if(!filt.length){el.innerHTML='<div class="empty">Tişt tune</div>';return;}
+
+  const approvedVejin=apps.filter(x=>x.status==='approved'&&x.vejin).length;
+  const approvedStd=apps.filter(x=>x.status==='approved'&&!x.vejin).length;
+
+  el.innerHTML=filt.map((a,i)=>{
+    const langStr=(a.langs||[]).join(' · ')||'—';
+    const zarStr=(a.zaravalar||[]).join(' · ')||'—';
+    const emailRow=a.email?`<div class="info-row"><span class="info-lbl">📧</span><span class="info-val" style="color:var(--gold)">${a.email}</span></div>`:'';
+    const rtkBadge=a.vejin?`<span class="rtk-badge">✦ RTK</span>`:'';
+    const idBadge=a.id?`<span class="id-badge">${a.id}</span>`:'';
+
+    let btns='';
+    if(curTab==='pending'){
+      btns=`<div class="app-btns">
+        <button class="btn-approve" onclick="approveApp('${a.twitter}')">✓ Erê bike</button>
+        <button class="btn-reject" onclick="rejectApp('${a.twitter}')">✕ Red bike</button>
+      </div>`;
+    } else if(curTab==='approved'){
+      btns=`<button class="btn-reset" onclick="resetPw('${a.twitter}')">🔑 Şîfreyê nû bike</button>
+            <button class="btn-revoke" onclick="revokeApp('${a.twitter}')">🗑 Betal bike</button>`;
+    } else if(curTab==='revoked'||curTab==='rejected'){
+      btns=`<button class="btn-restore" onclick="restoreApp('${a.twitter}')">✅ Vegerîne</button>
+            <button class="btn-delete" onclick="deleteApp('${a.twitter}')">🗑 Bi tevahî jêbibe</button>`;
+    }
+
+    return `<div class="app-card ${a.vejin?'rtk':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div>
+          <div class="app-name">${a.name}</div>
+          <div class="app-handle">@${a.twitter}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="date">${a.submitted}</div>
+          <div style="margin-top:3px">${rtkBadge} ${idBadge}</div>
+        </div>
+      </div>
+      <div class="app-info">
+        <div class="info-row"><span class="info-lbl">🌍 Welat</span><span class="info-val">${a.country||'—'}</span></div>
+        <div class="info-row"><span class="info-lbl">📍 Herêm</span><span class="info-val">${a.affinity||'—'}</span></div>
+        <div class="info-row"><span class="info-lbl">🗣 Ziman</span><span class="info-val">${langStr}</span></div>
+        <div class="info-row"><span class="info-lbl">💬 Zarave</span><span class="info-val">${zarStr}</span></div>
+        ${emailRow}
+      </div>
+      ${btns}
+    </div>`;
+  }).join('');
+}
+
+async function approveApp(twitter){
+  const a=apps.find(x=>x.twitter===twitter);
+  if(!a)return;
+  const approvedVejin=apps.filter(x=>x.status==='approved'&&x.vejin).length;
+  const approvedStd=apps.filter(x=>x.status==='approved'&&!x.vejin).length;
+  const serial=a.vejin?approvedVejin+1:approvedStd+1;
+  const prefix=a.vejin?'RTK-':'KRD-';
+  const id=prefix+String(serial).padStart(5,'0');
+  const totalApproved=apps.filter(x=>x.status==='approved').length+1;
+  const kurNo='KUR-'+String(totalApproved).padStart(5,'0');
+  const did='did:kurdi:'+a.twitter.toLowerCase()+Math.random().toString(36).slice(2,7);
+  const now=new Date().toISOString();
+  try{
+    await sbFetch('applications?twitter=eq.'+twitter,{
+      method:'PATCH',
+      body:JSON.stringify({status:'approved',krd_number:id,serial,did,approved_at:now,first_login:true,notes:kurNo})
+    });
+    toast('✓ '+a.name+' erêkirî! '+(a.email?'📧 '+a.email:''));
+    await loadApps();
+  }catch(e){toast('Xelet: '+e.message,false);}
+}
+
+async function rejectApp(twitter){
+  if(!confirm('Red bike: @'+twitter+'?'))return;
+  try{
+    await sbFetch('applications?twitter=eq.'+twitter,{method:'PATCH',body:JSON.stringify({status:'rejected',rejected_at:new Date().toISOString()})});
+    toast('Redkirî: @'+twitter);
+    await loadApps();
+  }catch(e){toast('Xelet',false);}
+}
+
+async function revokeApp(twitter){
+  if(!confirm('Betal bike: @'+twitter+'?'))return;
+  try{
+    await sbFetch('applications?twitter=eq.'+twitter,{method:'PATCH',body:JSON.stringify({status:'revoked'})});
+    toast('Betalkirin: @'+twitter);
+    await loadApps();
+  }catch(e){toast('Xelet',false);}
+}
+
+async function restoreApp(twitter){
+  try{
+    await sbFetch('applications?twitter=eq.'+twitter,{method:'PATCH',body:JSON.stringify({status:'approved',first_login:true})});
+    toast('Vegerand: @'+twitter);
+    await loadApps();
+  }catch(e){toast('Xelet',false);}
+}
+
+async function deleteApp(twitter){
+  if(!confirm('Bi tevahî jêbibe: @'+twitter+'? Nayê vegerandin!'))return;
+  try{
+    await sbFetch('applications?twitter=eq.'+twitter,{method:'DELETE',prefer:'return=minimal'});
+    toast('Jêbirina: @'+twitter);
+    await loadApps();
+  }catch(e){toast('Xelet',false);}
+}
+
+async function resetPw(twitter){
+  if(!confirm('Şîfreyê nû bike: @'+twitter+'?'))return;
+  try{
+    await sbFetch('applications?twitter=eq.'+twitter,{method:'PATCH',body:JSON.stringify({pw_reset:true,pw_hash:null})});
+    toast('🔑 Şîfreya @'+twitter+' hat sifirkirin');
+    await loadApps();
+  }catch(e){toast('Xelet',false);}
+}
+
+async function saveInvite(){
+  const val=document.getElementById('inv-inp').value.trim();
+  if(!val)return;
+  try{
+    await sbFetch('invite_codes',{method:'DELETE',prefer:'return=minimal'});
+    await sbFetch('invite_codes',{method:'POST',prefer:'return=minimal',body:JSON.stringify({code:val,active:true})});
+    inviteCode=val;
+    document.getElementById('inv-current').textContent=val;
+    document.getElementById('inv-inp').value='';
+    toast('✓ Kod guherî: '+val);
+  }catch(e){toast('Xelet',false);}
+}
+</script>
+</body>
+</html>
