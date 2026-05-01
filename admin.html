@@ -164,8 +164,8 @@ const SB_URL='https://ayyuetqyfjdbxmnqhgyz.supabase.co';
 const SB_KEY='sb_publishable_dNrjycfPx-IVej6rxH0ICw_uVNzyWZD';
 
 // Admin password hash (same as nasKURD)
-function hp(s){let h=0;for(let i=0;i<s.length;i++)h=(Math.imul(31,h)+s.charCodeAt(i))|0;return h.toString(36);}
-const APWD=hp('rojtev17');
+// Admin auth via API
+
 
 let apps=[], curTab='pending', inviteCode='nasKURD2025';
 
@@ -204,12 +204,29 @@ document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')
 function doLogin(){
   const v=document.getElementById('pw').value;
   const err=document.getElementById('pw-err');
-  if(hp(v)!==APWD){err.style.display='block';document.getElementById('pw').value='';return;}
+  if(!v){err.style.display='block';return;}
   err.style.display='none';
-  sessionStorage.setItem('nk_admin','1');
-  document.getElementById('login').style.display='none';
-  document.getElementById('admin').style.display='block';
-  loadAll();
+  fetch('/api/admin-auth',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({password:v})
+  })
+  .then(r=>r.json())
+  .then(data=>{
+    if(data.ok){
+      sessionStorage.setItem('nk_admin','1');
+      document.getElementById('login').style.display='none';
+      document.getElementById('admin').style.display='block';
+      loadAll();
+    } else {
+      err.style.display='block';
+      document.getElementById('pw').value='';
+    }
+  })
+  .catch(()=>{
+    err.style.display='block';
+    document.getElementById('pw').value='';
+  });
 }
 function doLogout(){
   sessionStorage.removeItem('nk_admin');
