@@ -165,7 +165,7 @@ const SB_KEY='sb_publishable_dNrjycfPx-IVej6rxH0ICw_uVNzyWZD';
 
 // Admin password hash (same as nasKURD)
 function hp(s){let h=0;for(let i=0;i<s.length;i++)h=(Math.imul(31,h)+s.charCodeAt(i))|0;return h.toString(36);}
-const APWD='mormop';
+const APWD='-5499k2';
 
 
 let apps=[], curTab='pending', inviteCode='nasKURD2025';
@@ -349,7 +349,7 @@ async function approveApp(twitter){
         body:JSON.stringify({type:'approved',twitter:a.twitter,name:a.name,email:a.email})
       }).catch(e=>console.error('Email error:',e));
     }
-    toast('✓ '+a.name+' erêkirî! '+(a.email?'📧 E-peyam hat şandin.':'⚠️ E-peyam tune!'));
+    toast('✓ '+a.name+' erêkirî! '+(a.email?'📧 E-peyam hat şandin.':''));
     await loadApps();
   }catch(e){toast('Xelet: '+e.message,false);}
 }
