@@ -349,7 +349,7 @@ async function approveApp(twitter){
         body:JSON.stringify({type:'approved',twitter:a.twitter,name:a.name,email:a.email})
       }).catch(e=>console.error('Email error:',e));
     }
-    toast('DEBUG: email=['+a.email+'] name=['+a.name+']');
+    toast('✓ '+a.name+' erêkirî! '+(a.email?'📧 E-peyam hat şandin.':'⚠️ E-peyam tune!'));
     await loadApps();
   }catch(e){toast('Xelet: '+e.message,false);}
 }
