@@ -165,7 +165,8 @@ const SB_KEY='sb_publishable_dNrjycfPx-IVej6rxH0ICw_uVNzyWZD';
 
 // Admin password hash (same as nasKURD)
 function hp(s){let h=0;for(let i=0;i<s.length;i++)h=(Math.imul(31,h)+s.charCodeAt(i))|0;return h.toString(36);}
-const APWD=hp('rojtev17');
+const APWD='mormop';
+
 
 let apps=[], curTab='pending', inviteCode='nasKURD2025';
 
@@ -341,27 +342,67 @@ async function approveApp(twitter){
       method:'PATCH',
       body:JSON.stringify({status:'approved',krd_number:id,serial,did,approved_at:now,first_login:true,notes:kurNo})
     });
-    toast('✓ '+a.name+' erêkirî! '+(a.email?'📧 '+a.email:''));
+    if(a.email){
+      fetch('https://naskurd.com/api/send-email',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({type:'approved',twitter:a.twitter,name:a.name,email:a.email})
+      }).catch(e=>console.error('Email error:',e));
+    }
+    toast('✓ '+a.name+' erêkirî! '+(a.email?'📧 E-peyam hat şandin.':'⚠️ E-peyam tune!'));
     await loadApps();
   }catch(e){toast('Xelet: '+e.message,false);}
 }
 
+// Mobile-safe confirmation helper
+function mobileConfirm(btn, action){
+  if(btn.dataset.confirming==='1'){
+    btn.dataset.confirming='0';
+    action();
+    return;
+  }
+  const orig=btn.innerHTML;
+  const origBg=btn.style.background;
+  btn.dataset.confirming='1';
+  btn.innerHTML='⚠️ Piştrast? Dîsa bixin!';
+  btn.style.background='rgba(192,57,43,.5)';
+  setTimeout(()=>{
+    if(btn.dataset.confirming==='1'){
+      btn.dataset.confirming='0';
+      btn.innerHTML=orig;
+      btn.style.background=origBg;
+    }
+  },3000);
+}
+
 async function rejectApp(twitter){
-  if(!confirm('Red bike: @'+twitter+'?'))return;
-  try{
-    await sbFetch('applications?twitter=eq.'+twitter,{method:'PATCH',body:JSON.stringify({status:'rejected',rejected_at:new Date().toISOString()})});
-    toast('Redkirî: @'+twitter);
-    await loadApps();
-  }catch(e){toast('Xelet',false);}
+  const btn=event.currentTarget;
+  mobileConfirm(btn,async()=>{
+    const a=apps.find(x=>x.twitter===twitter);
+    try{
+      await sbFetch('applications?twitter=eq.'+twitter,{method:'PATCH',body:JSON.stringify({status:'rejected',rejected_at:new Date().toISOString()})});
+      if(a&&a.email){
+        fetch('https://naskurd.com/api/send-email',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({type:'rejected',twitter:a.twitter,name:a.name,email:a.email})
+        }).catch(e=>console.error('Email error:',e));
+      }
+      toast('Redkirî: @'+twitter);
+      await loadApps();
+    }catch(e){toast('Xelet',false);}
+  });
 }
 
 async function revokeApp(twitter){
-  if(!confirm('Betal bike: @'+twitter+'?'))return;
-  try{
-    await sbFetch('applications?twitter=eq.'+twitter,{method:'PATCH',body:JSON.stringify({status:'revoked'})});
-    toast('Betalkirin: @'+twitter);
-    await loadApps();
-  }catch(e){toast('Xelet',false);}
+  const btn=event.currentTarget;
+  mobileConfirm(btn,async()=>{
+    try{
+      await sbFetch('applications?twitter=eq.'+twitter,{method:'PATCH',body:JSON.stringify({status:'revoked'})});
+      toast('Betalkirin: @'+twitter);
+      await loadApps();
+    }catch(e){toast('Xelet',false);}
+  });
 }
 
 async function restoreApp(twitter){
@@ -373,21 +414,50 @@ async function restoreApp(twitter){
 }
 
 async function deleteApp(twitter){
-  if(!confirm('Bi tevahî jêbibe: @'+twitter+'? Nayê vegerandin!'))return;
-  try{
-    await sbFetch('applications?twitter=eq.'+twitter,{method:'DELETE',prefer:'return=minimal'});
-    toast('Jêbirina: @'+twitter);
-    await loadApps();
-  }catch(e){toast('Xelet',false);}
+  // Find the button by twitter handle
+  const allBtns=document.querySelectorAll('.btn-delete');
+  let btn=null;
+  allBtns.forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes(twitter))btn=b;});
+  if(!btn){
+    // fallback: direct delete
+    try{
+      await sbFetch('applications?twitter=eq.'+twitter,{method:'DELETE',prefer:'return=minimal'});
+      toast('Jêbirina: @'+twitter);
+      await loadApps();
+    }catch(e){toast('Xelet',false);}
+    return;
+  }
+  if(btn.dataset.confirming==='1'){
+    btn.dataset.confirming='0';
+    try{
+      await sbFetch('applications?twitter=eq.'+twitter,{method:'DELETE',prefer:'return=minimal'});
+      toast('Jêbirina: @'+twitter);
+      await loadApps();
+    }catch(e){toast('Xelet',false);}
+    return;
+  }
+  const orig=btn.innerHTML;
+  btn.dataset.confirming='1';
+  btn.innerHTML='⚠️ Dîsa bixin!';
+  btn.style.background='rgba(192,57,43,.6)';
+  setTimeout(()=>{
+    if(btn.dataset.confirming==='1'){
+      btn.dataset.confirming='0';
+      btn.innerHTML=orig;
+      btn.style.background='';
+    }
+  },3000);
 }
 
 async function resetPw(twitter){
-  if(!confirm('Şîfreyê nû bike: @'+twitter+'?'))return;
-  try{
-    await sbFetch('applications?twitter=eq.'+twitter,{method:'PATCH',body:JSON.stringify({pw_reset:true,pw_hash:null})});
-    toast('🔑 Şîfreya @'+twitter+' hat sifirkirin');
-    await loadApps();
-  }catch(e){toast('Xelet',false);}
+  const btn=event.currentTarget;
+  mobileConfirm(btn,async()=>{
+    try{
+      await sbFetch('applications?twitter=eq.'+twitter,{method:'PATCH',body:JSON.stringify({pw_reset:true,pw_hash:null})});
+      toast('🔑 Şîfreya @'+twitter+' hat sifirkirin');
+      await loadApps();
+    }catch(e){toast('Xelet',false);}
+  });
 }
 
 async function saveInvite(){
