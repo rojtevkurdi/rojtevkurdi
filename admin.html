@@ -342,7 +342,14 @@ async function approveApp(twitter){
       method:'PATCH',
       body:JSON.stringify({status:'approved',krd_number:id,serial,did,approved_at:now,first_login:true,notes:kurNo})
     });
-    toast('✓ '+a.name+' erêkirî! '+(a.email?'📧 '+a.email:''));
+    if(a.email){
+      fetch('https://naskurd.com/api/send-email',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({type:'approved',twitter:a.twitter,name:a.name,email:a.email})
+      }).catch(e=>console.error('Email error:',e));
+    }
+    toast('✓ '+a.name+' erêkirî! '+(a.email?'📧 E-peyam hat şandin.':''));
     await loadApps();
   }catch(e){toast('Xelet: '+e.message,false);}
 }
@@ -371,8 +378,16 @@ function mobileConfirm(btn, action){
 async function rejectApp(twitter){
   const btn=event.currentTarget;
   mobileConfirm(btn,async()=>{
+    const a=apps.find(x=>x.twitter===twitter);
     try{
       await sbFetch('applications?twitter=eq.'+twitter,{method:'PATCH',body:JSON.stringify({status:'rejected',rejected_at:new Date().toISOString()})});
+      if(a&&a.email){
+        fetch('https://naskurd.com/api/send-email',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({type:'rejected',twitter:a.twitter,name:a.name,email:a.email})
+        }).catch(e=>console.error('Email error:',e));
+      }
       toast('Redkirî: @'+twitter);
       await loadApps();
     }catch(e){toast('Xelet',false);}
