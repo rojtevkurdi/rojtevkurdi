@@ -343,7 +343,7 @@ async function approveApp(twitter){
       body:JSON.stringify({status:'approved',krd_number:id,serial,did,approved_at:now,first_login:true,notes:kurNo})
     });
     if(a.email){
-      fetch('https://naskurd.com/api/send-email',{
+      fetch('/api/send-email',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({type:'approved',twitter:a.twitter,name:a.name,email:a.email})
@@ -382,7 +382,7 @@ async function rejectApp(twitter){
     try{
       await sbFetch('applications?twitter=eq.'+twitter,{method:'PATCH',body:JSON.stringify({status:'rejected',rejected_at:new Date().toISOString()})});
       if(a&&a.email){
-        fetch('https://naskurd.com/api/send-email',{
+        fetch('/api/send-email',{
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body:JSON.stringify({type:'rejected',twitter:a.twitter,name:a.name,email:a.email})
