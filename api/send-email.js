@@ -41,15 +41,19 @@ module.exports = async function handler(req, res) {
     `;
   } else if (type === 'approved') {
     to = email;
-    subject = `nasKURD — Serlêdana te hat erêkirin! ✅`;
+    subject = `nasKURD — Serlêdana we hat erêkirin! ✅`;
     html = `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#020B18;color:#eee;border-radius:12px;overflow:hidden">
         <div style="height:4px;background:linear-gradient(90deg,#C8202A,#F5C518 50%,#1B7040)"></div>
         <div style="padding:24px;text-align:center">
           <h2 style="color:#4EC87A;margin:0 0 8px">✅ Hûn û Kurdistan her hebin!</h2>
           <p style="color:#C4A24C;font-size:18px;font-weight:700;margin:0 0 16px">@${twitter}</p>
-          <p style="color:#aaa;margin:0 0 20px">Serlêdana te hat erêkirin. Niha dikari bi hesabê xwe yê X/Twitter ketî nasKURD û nasnameya xwe ya dîjîtal bibîni.</p>
-          <a href="https://naskurd.com" style="background:linear-gradient(90deg,#C8202A,#C4A24C 50%,#1B7040);color:#000;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">nasKURD.com — Têkeve →</a>
+          <p style="color:#aaa;margin:0 0 20px">Serlêdana we hat erêkirin. Niha hûn karin bi rûpelê xwe, yê X/Twîtterê têkevin naskurd.com ê û nasnameya xwe ya dijîtal bibînin û daxwaz bikin.</p>
+          <a href="https://naskurd.com" style="background:linear-gradient(90deg,#C8202A,#C4A24C 50%,#1B7040);color:#000;padding:12px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px">naskurd.com - Têkeve →</a>
+          <div style="margin-top:24px;padding:16px;background:rgba(196,162,76,0.08);border:1px solid rgba(196,162,76,0.25);border-radius:10px">
+            <p style="color:#C4A24C;font-size:12px;margin:0 0 8px;font-weight:700">🔗 Nasnameya xwe ya dijîtal parve bike:</p>
+            <a href="https://naskurd.com/verify/@${twitter}" style="color:#4EC87A;font-size:13px;word-break:break-all;text-decoration:none">naskurd.com/verify/@${twitter}</a>
+          </div>
           <p style="color:rgba(196,162,76,.4);font-size:10px;margin-top:24px">@rojtevkurdi · @torakurdakurdi · @_nasKURD</p>
         </div>
         <div style="height:4px;background:linear-gradient(90deg,#1B7040,#F5C518 50%,#C8202A)"></div>
